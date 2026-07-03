@@ -41,6 +41,14 @@ public class MyStudentService {
         this.objectMapper = objectMapper;
     }
 
+
+    public void addSingleStudent(POSTStudentRequestDTO POSTStudentRequestDTO){
+        Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
+        student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
+        myStudentRepository.save(student);
+    }
+
+
     public List<GETStudentResponseDTO> fetchAllStudent(){
         List<Student> students=  myStudentRepository.findAll();
         if(!ObjectUtils.isEmpty(students))
@@ -71,11 +79,7 @@ public class MyStudentService {
          myStudentRepository.deleteById(id);
     }
 
-    public void addSingleStudent(POSTStudentRequestDTO POSTStudentRequestDTO){
-        Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
-        student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
-        myStudentRepository.save(student);
-    }
+
 
     public List<GETStudentResponseDTO> getTheNRIStudentFromThisState(String state){
         List<Student> nriStudents= myStudentRepository.findNRIStudentsFromGivenState(state);
