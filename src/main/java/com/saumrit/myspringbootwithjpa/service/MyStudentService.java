@@ -5,6 +5,7 @@ import com.saumrit.myspringbootwithjpa.dto.AssignmentResponseDTO;
 import com.saumrit.myspringbootwithjpa.dto.GETStudentResponseDTO;
 import com.saumrit.myspringbootwithjpa.dto.POSTStudentRequestDTO;
 import com.saumrit.myspringbootwithjpa.dto.StudentWithHouseNumberDetailDto;
+import com.saumrit.myspringbootwithjpa.message.producers.StudentProducer;
 import com.saumrit.myspringbootwithjpa.model.*;
 import com.saumrit.myspringbootwithjpa.model.enums.CourseCategory;
 import com.saumrit.myspringbootwithjpa.repository.MyAssignmentRepository;
@@ -30,14 +31,16 @@ public class MyStudentService {
     public final MyAssignmentRepository myAssignmentRepository;
     public final MyTutorialCourseService myTutorialCourseService;
     public final UniqueIdGeneratorUtil uniqueIdGeneratorUtil;
+    public final StudentProducer studentProducer;
     public final ObjectMapper objectMapper;
 
-    public MyStudentService(MyStudentRepository myStudentRepository, MySubjectRepository mySubjectRepository, MyAssignmentRepository myAssignmentRepository, MyTutorialCourseService myTutorialCourseService, UniqueIdGeneratorUtil uniqueIdGeneratorUtil, ObjectMapper objectMapper) {
+    public MyStudentService(MyStudentRepository myStudentRepository, MySubjectRepository mySubjectRepository, MyAssignmentRepository myAssignmentRepository, MyTutorialCourseService myTutorialCourseService, UniqueIdGeneratorUtil uniqueIdGeneratorUtil, StudentProducer studentProducer, ObjectMapper objectMapper) {
         this.myStudentRepository=myStudentRepository;
         this.mySubjectRepository = mySubjectRepository;
         this.myAssignmentRepository = myAssignmentRepository;
         this.myTutorialCourseService = myTutorialCourseService;
         this.uniqueIdGeneratorUtil = uniqueIdGeneratorUtil;
+        this.studentProducer = studentProducer;
         this.objectMapper = objectMapper;
     }
 
@@ -46,6 +49,16 @@ public class MyStudentService {
         Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
         student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
         myStudentRepository.save(student);
+        studentProducer.produceMessageForAddStudent("addstudent-out-0",student);
+    }
+
+    public void addMultipleStudent(List<POSTStudentRequestDTO> studentrequestDTOs) {
+        studentrequestDTOs.forEach(x -> {
+            Student student= createStudentFromStudentDTO(x);
+            student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
+            myStudentRepository.save(student);
+            studentProducer.produceMessageForAddStudent("addstudent-out-0",student);
+        });
     }
 
 
@@ -185,6 +198,18 @@ public class MyStudentService {
                     studentWithHouseNumberDetailDto.setRoll(x.getRollId());
                     return studentWithHouseNumberDetailDto;
                 }).toList();
+    }
+
+    public List<Student> getStudentsByNameUsingCriteria(String name){
+        return myStudentRepository.giveMeStudentsFromName(name);
+    }
+
+    public List<Student> getStudentsByNameAndCityUsingCriteria(String name,String city){
+        return myStudentRepository.giveMeStudentsWithNameAndCity(name,city);
+    }
+
+    public List<String> getCountriesForStudentsWithCourseName(String courseName){
+        return myStudentRepository.fetchCountryForStudentsWithGivenCourseName(courseName);
     }
 
 

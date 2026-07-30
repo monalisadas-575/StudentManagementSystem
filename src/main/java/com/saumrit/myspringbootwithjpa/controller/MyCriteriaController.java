@@ -1,0 +1,61 @@
+package com.saumrit.myspringbootwithjpa.controller;
+
+import com.saumrit.myspringbootwithjpa.model.Student;
+import com.saumrit.myspringbootwithjpa.service.MyStudentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/criteria")
+public class MyCriteriaController {
+
+    public final MyStudentService studentService;
+
+    public MyCriteriaController(MyStudentService studentService) {
+        this.studentService = studentService;
+    }
+
+    @Operation(summary = "Fetch Students with given name using Criteria API",
+            description = "Fetch Students with given name using Criteria API")
+    @GetMapping("/students/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<Student> getStudentsByNameUsingCriteria(@PathVariable("name") String name){
+        return studentService.getStudentsByNameUsingCriteria(name);
+
+    }
+
+    @Operation(summary = "Fetch Students with given name and city using Criteria API",
+            description = "Fetch Students with given name and city using Criteria API")
+    @GetMapping("/students/{name}/{city}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<Student> getStudentsByNameAndCityUsingCriteria(@PathVariable("name") String name, @PathVariable("city") String city ){
+        return studentService.getStudentsByNameAndCityUsingCriteria(name,city);
+
+    }
+
+    @Operation(summary = "Fetch Country for the Students with given course name",
+            description = "Fetch Country for the Students with given course name using Criteria API")
+    @GetMapping("/students/course/{coursename}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<String> getStudentsByNameAndCityUsingCriteria(@PathVariable("coursename") String coursename){
+        return studentService.getCountriesForStudentsWithCourseName(coursename);
+
+    }
+}

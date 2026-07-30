@@ -37,6 +37,18 @@ public class MyStudentController {
         myStudentService.addSingleStudent(POSTStudentRequestDTO);
     }
 
+    @Operation(summary = "Circular Exception in Bidirectional Mapping + @JsonManagedReference + @JsonBackReference",
+            description = "Api to add a Student+  Here check the annotation to tackle stackOverFlow Exception ")
+    @PostMapping("/addManyStudent")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public void addmanyStudent(@RequestBody List<POSTStudentRequestDTO> allStudents){
+        myStudentService.addMultipleStudent(allStudents);
+    }
+
     @Operation(summary = "Api to get All Students",
     description = "Api to get All Students")
     @GetMapping("/getAllStudents")

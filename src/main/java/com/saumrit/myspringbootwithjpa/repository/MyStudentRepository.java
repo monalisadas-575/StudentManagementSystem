@@ -1,6 +1,7 @@
 package com.saumrit.myspringbootwithjpa.repository;
 
 import com.saumrit.myspringbootwithjpa.model.Student;
+import com.saumrit.myspringbootwithjpa.repository.custom.MyCustomRepository;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface MyStudentRepository extends JpaRepository<Student, String> {
+public interface MyStudentRepository extends JpaRepository<Student, String>, MyCustomRepository {
 
     @Transactional(timeout = 10)
     public List<Student> findByName(String name);
