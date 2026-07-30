@@ -1,22 +1,44 @@
 spring:
+#  profiles:
+#    active: local
   datasource:
-    url: jdbc:mysql://localhost:3307/myapp_db
-    username: admin
-    password: password123
+    url: jdbc:mysql://localhost:3306/my_database
+    username: my_user
+    password: my_password
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-#      naming:
-#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-  profiles.active: local
-
+  rabbitmq:
+    host: localhost
+    port: 5675
+    username: guest
+    password: guest
+    virtual-host: /
+    ssl:
+      enabled: false
+    eager-initializer: true
+  cloud:
+    stream:
+      # FIX: bindings and rabbit must be indented inside stream
+      bindings:
+        addstudent-out-0:
+          destination: dungu.my-first-exchange
+          contentType: application/json
+          binder: rabbit
+      rabbit:
+        bindings:
+          addstudent-out-0:
+            producer:
+              declareExchange: true
+              routing-key-expression: "'dungu.student.key'" # FIX: Must be wrapped in single quotes inside double quotes for a literal string expression
 
 management:
   endpoints:
     web:
       exposure:
         include: mappings
+
 springdoc:
   swagger-ui:
-    path: "/swagger-ui.html"
+    path: /swagger-ui.html
