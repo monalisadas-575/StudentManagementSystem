@@ -2,8 +2,8 @@ package com.saumrit.myspringbootwithjpa.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saumrit.myspringbootwithjpa.dto.AssignmentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.GETStudentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.POSTStudentRequestDTO;
+import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
+import com.saumrit.myspringbootwithjpa.dto.PostStudentRequestDTO;
 import com.saumrit.myspringbootwithjpa.dto.StudentWithHouseNumberDetailDto;
 import com.saumrit.myspringbootwithjpa.message.producers.StudentProducer;
 import com.saumrit.myspringbootwithjpa.model.*;
@@ -13,14 +13,13 @@ import com.saumrit.myspringbootwithjpa.repository.MyStudentRepository;
 import com.saumrit.myspringbootwithjpa.repository.MySubjectRepository;
 import com.saumrit.myspringbootwithjpa.util.CommonConvertorUtil;
 import com.saumrit.myspringbootwithjpa.util.UniqueIdGeneratorUtil;
+import jakarta.persistence.Tuple;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -45,14 +44,14 @@ public class MyStudentService {
     }
 
 
-    public void addSingleStudent(POSTStudentRequestDTO POSTStudentRequestDTO){
+    public void addSingleStudent(PostStudentRequestDTO POSTStudentRequestDTO){
         Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
         student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
         myStudentRepository.save(student);
         studentProducer.produceMessageForAddStudent("addstudent-out-0",student);
     }
 
-    public void addMultipleStudent(List<POSTStudentRequestDTO> studentrequestDTOs) {
+    public void addMultipleStudent(List<PostStudentRequestDTO> studentrequestDTOs) {
         studentrequestDTOs.forEach(x -> {
             Student student= createStudentFromStudentDTO(x);
             student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
@@ -62,30 +61,30 @@ public class MyStudentService {
     }
 
 
-    public List<GETStudentResponseDTO> fetchAllStudent(){
+    public List<GetStudentResponseDTO> fetchAllStudent(){
         List<Student> students=  myStudentRepository.findAll();
         if(!ObjectUtils.isEmpty(students))
             return students.stream()
-                    .map(x -> objectMapper.convertValue(x, GETStudentResponseDTO.class))
+                    .map(x -> objectMapper.convertValue(x, GetStudentResponseDTO.class))
                     .toList();
         return null;
     }
 
-    public List<GETStudentResponseDTO> fetchAllStudentSortedBy(String sort_property_name){
+    public List<GetStudentResponseDTO> fetchAllStudentSortedBy(String sort_property_name){
         Sort sort= Sort.by("age").descending();
         List<Student> students= myStudentRepository.findAll(sort);
         if(!ObjectUtils.isEmpty(students))
             return students.stream()
-                    .map(x -> objectMapper.convertValue(x, GETStudentResponseDTO.class))
+                    .map(x -> objectMapper.convertValue(x, GetStudentResponseDTO.class))
                     .toList();
         return null;
     }
 
-    public GETStudentResponseDTO fetchAStudentByNameOrRollId(String name , String roll){
+    public GetStudentResponseDTO fetchAStudentByNameOrRollId(String name , String roll){
         if(null== name && null == roll)
             return null;
         Student student= myStudentRepository.findByNameOrRollId(name, roll);
-        return objectMapper.convertValue(student, GETStudentResponseDTO.class);
+        return objectMapper.convertValue(student, GetStudentResponseDTO.class);
     }
 
     public void deleteStudent(String id){
@@ -94,10 +93,10 @@ public class MyStudentService {
 
 
 
-    public List<GETStudentResponseDTO> getTheNRIStudentFromThisState(String state){
+    public List<GetStudentResponseDTO> getTheNRIStudentFromThisState(String state){
         List<Student> nriStudents= myStudentRepository.findNRIStudentsFromGivenState(state);
         return nriStudents.stream()
-                .map(x -> objectMapper.convertValue(x, GETStudentResponseDTO.class))
+                .map(x -> objectMapper.convertValue(x, GetStudentResponseDTO.class))
                 .toList();
     }
 
@@ -158,12 +157,12 @@ public class MyStudentService {
         return myStudentRepository.updateTheNRIStatusOFAnyStudent(roll, status);
     }
 
-    public GETStudentResponseDTO getStudentWithAdvanceNameSearch(String name){
+    public GetStudentResponseDTO getStudentWithAdvanceNameSearch(String name){
         Student student= myStudentRepository.searchStudentWithAdvanceNameSearchWithSpecialCharacterSupport(name, Limit.of(1));
-        return objectMapper.convertValue(student, GETStudentResponseDTO.class);
+        return objectMapper.convertValue(student, GetStudentResponseDTO.class);
     }
 
-    private Student createStudentFromStudentDTO(POSTStudentRequestDTO POSTStudentRequestDTO){
+    private Student createStudentFromStudentDTO(PostStudentRequestDTO POSTStudentRequestDTO){
         Student student= objectMapper.convertValue(POSTStudentRequestDTO, Student.class);
         student.setAddress(objectMapper.convertValue(POSTStudentRequestDTO.getAddressDTO(), Address.class));
         return student;
@@ -210,6 +209,24 @@ public class MyStudentService {
 
     public List<String> getCountriesForStudentsWithCourseName(String courseName){
         return myStudentRepository.fetchCountryForStudentsWithGivenCourseName(courseName);
+    }
+
+    public List<GetStudentResponseDTO> getStudentsWithCityDetailFromGivenCountry(String countryName){
+        List<Tuple> results= myStudentRepository.fetchStudentWithTheirCity(countryName);
+        List<GetStudentResponseDTO> myResult=results.stream().map( x -> {
+            GetStudentResponseDTO getStudentResponseDTO = new GetStudentResponseDTO();
+            getStudentResponseDTO.setCity((String)x.get("CITY"));
+            getStudentResponseDTO.setName(x.get("NAME",String.class));
+            getStudentResponseDTO.setAge(x.get(2,Integer.class));
+            return getStudentResponseDTO;
+        }).toList();
+
+        return myResult;
+    }
+
+    @Transactional
+    public Integer updateStudentAgeToThirtyFromThisCity(String city){
+        return myStudentRepository.updateAgeByTwoForStudentsFromThisCity(city);
     }
 
 

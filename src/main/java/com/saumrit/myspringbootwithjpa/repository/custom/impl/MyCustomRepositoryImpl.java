@@ -4,6 +4,7 @@ import com.saumrit.myspringbootwithjpa.model.*;
 import com.saumrit.myspringbootwithjpa.repository.custom.MyCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Component;
 
@@ -69,4 +70,42 @@ public class MyCustomRepositoryImpl implements MyCustomRepository {
         List<String> countries= entityManager.createQuery(criteriaQuery).getResultStream().toList();
         return countries;
     }
+
+    @Override
+    public List<Tuple> fetchStudentWithTheirCity(String country) {
+        CriteriaBuilder criteriaBuilder= entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<Tuple> criteriaQuery= criteriaBuilder.createQuery(Tuple.class);
+        Root<Student> root= criteriaQuery.from(Student.class);
+        Join<Student,Address> join= root.join(Student_.ADDRESS);
+
+        criteriaQuery
+                .multiselect(
+                        root.get(Student_.NAME).alias("NAME"),
+                        join.get(Address_.CITY).alias("CITY"),
+                        root.get(Student_.AGE).alias("AGE"))
+                .where(criteriaBuilder.equal(join.get(Address_.COUNTRY),country));
+
+        List<Tuple> results= entityManager.createQuery(criteriaQuery).getResultList();
+
+        return results;
+    }
+
+    @Override
+    public Integer updateAgeByTwoForStudentsFromThisCity(String city) {
+        CriteriaBuilder criteriaBuilder= entityManager.getCriteriaBuilder();
+        CriteriaUpdate<Student> criteriaUpdate= criteriaBuilder.createCriteriaUpdate(Student.class);
+        Root<Student> root= criteriaUpdate.from(Student.class);
+        Join<Student,Address> join= root.join(Student_.ADDRESS);
+
+        criteriaUpdate
+                .set(root.get(Student_.AGE),30)
+                .where(criteriaBuilder.equal(join.get(Address_.CITY),city));
+
+        Integer count=entityManager.createQuery(criteriaUpdate).executeUpdate();
+
+        return count;
+    }
+
+
 }

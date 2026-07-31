@@ -1,6 +1,5 @@
 package com.saumrit.myspringbootwithjpa.controller;
 
-import com.saumrit.myspringbootwithjpa.dto.POSTStudentRequestDTO;
 import com.saumrit.myspringbootwithjpa.dto.TutorialCourseRequestDTO;
 import com.saumrit.myspringbootwithjpa.model.enums.CourseCategory;
 import com.saumrit.myspringbootwithjpa.service.MyTutorialCourseService;

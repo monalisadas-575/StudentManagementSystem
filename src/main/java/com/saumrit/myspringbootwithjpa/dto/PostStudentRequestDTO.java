@@ -1,17 +1,14 @@
 package com.saumrit.myspringbootwithjpa.dto;
 
 
-import com.saumrit.myspringbootwithjpa.model.TutorialCourse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class POSTStudentRequestDTO {
+public class PostStudentRequestDTO {
 
     public String name;
     public String standard;

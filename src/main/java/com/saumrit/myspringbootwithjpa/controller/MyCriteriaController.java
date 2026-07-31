@@ -1,5 +1,6 @@
 package com.saumrit.myspringbootwithjpa.controller;
 
+import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
 import com.saumrit.myspringbootwithjpa.model.Student;
 import com.saumrit.myspringbootwithjpa.service.MyStudentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,5 +58,29 @@ public class MyCriteriaController {
     public List<String> getStudentsByNameAndCityUsingCriteria(@PathVariable("coursename") String coursename){
         return studentService.getCountriesForStudentsWithCourseName(coursename);
 
+    }
+
+    @Operation(summary = "Fetch Student with their Name , Age and City from Given Country",
+            description = "Fetch Student with their Name , Age and City from Given Country using Criteria API")
+    @GetMapping("/students/detail/{country}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<GetStudentResponseDTO> getStudentDetailsWithCountryName(@PathVariable("country") String country){
+        return studentService.getStudentsWithCityDetailFromGivenCountry(country);
+    }
+
+    @Operation(summary = "Update Student;s age to 30, from Given City",
+            description = "Update Student;s age to 30, from Given City using Criteria API")
+    @PatchMapping("/students/age/{city}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public Integer updateAgeToThirty(@PathVariable("city") String city){
+        return studentService.updateStudentAgeToThirtyFromThisCity(city);
     }
 }

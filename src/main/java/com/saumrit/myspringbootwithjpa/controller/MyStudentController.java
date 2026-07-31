@@ -1,10 +1,9 @@
 package com.saumrit.myspringbootwithjpa.controller;
 
 import com.saumrit.myspringbootwithjpa.dto.AssignmentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.GETStudentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.POSTStudentRequestDTO;
+import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
+import com.saumrit.myspringbootwithjpa.dto.PostStudentRequestDTO;
 import com.saumrit.myspringbootwithjpa.dto.StudentWithHouseNumberDetailDto;
-import com.saumrit.myspringbootwithjpa.model.Assignment;
 import com.saumrit.myspringbootwithjpa.model.Student;
 import com.saumrit.myspringbootwithjpa.model.enums.CourseCategory;
 import com.saumrit.myspringbootwithjpa.service.MyStudentService;
@@ -33,7 +32,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public void addSingleStudent(@RequestBody POSTStudentRequestDTO POSTStudentRequestDTO){
+    public void addSingleStudent(@RequestBody PostStudentRequestDTO POSTStudentRequestDTO){
         myStudentService.addSingleStudent(POSTStudentRequestDTO);
     }
 
@@ -45,7 +44,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public void addmanyStudent(@RequestBody List<POSTStudentRequestDTO> allStudents){
+    public void addmanyStudent(@RequestBody List<PostStudentRequestDTO> allStudents){
         myStudentService.addMultipleStudent(allStudents);
     }
 
@@ -57,7 +56,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public List<GETStudentResponseDTO> getAllStudents(){
+    public List<GetStudentResponseDTO> getAllStudents(){
         return myStudentService.fetchAllStudent();
     }
 
@@ -93,7 +92,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public List<GETStudentResponseDTO> getAllNRIStudentsOfSpecificState(@RequestParam String stateName){
+    public List<GetStudentResponseDTO> getAllNRIStudentsOfSpecificState(@RequestParam String stateName){
         return myStudentService.getTheNRIStudentFromThisState(stateName);
     }
 
@@ -105,7 +104,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public List<GETStudentResponseDTO> getAllStudentsSortedBy(@RequestParam String sortPropertyName){
+    public List<GetStudentResponseDTO> getAllStudentsSortedBy(@RequestParam String sortPropertyName){
         return myStudentService.fetchAllStudentSortedBy(sortPropertyName);
     }
 
@@ -117,7 +116,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public GETStudentResponseDTO advanceSearchForStudent(@RequestParam String sortPropertyName){
+    public GetStudentResponseDTO advanceSearchForStudent(@RequestParam String sortPropertyName){
         return myStudentService.getStudentWithAdvanceNameSearch(sortPropertyName);
     }
 
@@ -129,7 +128,7 @@ public class MyStudentController {
             @ApiResponse(responseCode = "200",description = "Success"),
             @ApiResponse(responseCode = "400",description = "Bad Request"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
-    public GETStudentResponseDTO getAStudentByNameORRollNumber(@RequestParam String name, @RequestParam String roll){
+    public GetStudentResponseDTO getAStudentByNameORRollNumber(@RequestParam String name, @RequestParam String roll){
         return myStudentService.fetchAStudentByNameOrRollId(name,roll);
     }
 
