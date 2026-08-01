@@ -107,5 +107,60 @@ public class MyCustomRepositoryImpl implements MyCustomRepository {
         return count;
     }
 
+    @Override
+    public Integer deleteStudentByStudentName(String name) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Student> criteriaQuery = criteriaBuilder.createCriteriaDelete(Student.class);
+        Root<Student> root = criteriaQuery.from(Student.class);
+        criteriaQuery.
+                where(criteriaBuilder.equal(root.get(Student_.NAME),name));
+        int count = entityManager.createQuery(criteriaQuery).executeUpdate();
+        return count;
+    }
+
+    @Override
+    public List<Tuple> fetchStudentWithCityBasedOnNameLengthFromCity(String city) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createQuery(Tuple.class);
+        Root<Student> root = criteriaQuery.from(Student.class);
+        Join<Student,Address> join = root.join(Student_.ADDRESS);
+
+        criteriaQuery.
+                multiselect(
+                        root.get(Student_.NAME).alias("NAME"),
+                        join.get(Address_.CITY).alias("CITY"))
+                .where(criteriaBuilder.equal(join.get(Address_.CITY),city)).
+                orderBy(
+                        criteriaBuilder.desc(
+                                criteriaBuilder.length(root.get(Student_.NAME))
+                        )
+                );
+        List<Tuple> list = entityManager.createQuery(criteriaQuery).getResultStream().toList();
+
+        return list;
+    }
+
+    @Override
+    public List<Tuple> getCityWithStudentCountMoreThanTwo() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createQuery(Tuple.class);
+        Root<Student> root = criteriaQuery.from(Student.class);
+        Join<Student,Address> join = root.join(Student_.ADDRESS);
+        Expression<Long> count = criteriaBuilder.count(root);
+
+        criteriaQuery.
+                multiselect(
+                        count.alias("Student_count"),
+                        join.get(Address_.CITY).alias("CITY")
+
+                );
+        criteriaQuery.groupBy(join.get(Address_.CITY));
+        criteriaQuery.having(
+                criteriaBuilder.greaterThan(count,1l)
+        );
+        return entityManager.createQuery(criteriaQuery).getResultList();
+
+    }
+
 
 }

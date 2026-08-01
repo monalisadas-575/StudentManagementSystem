@@ -20,7 +20,7 @@ public class Address {
     public long id;
     public String city;
 
-    @Column(unique = true)
+    @Column
     public Long houseRegNumber;
     public String state;
     public Integer zipcode;

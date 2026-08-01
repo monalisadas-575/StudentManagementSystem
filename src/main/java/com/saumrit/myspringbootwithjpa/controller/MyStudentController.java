@@ -1,9 +1,6 @@
 package com.saumrit.myspringbootwithjpa.controller;
 
-import com.saumrit.myspringbootwithjpa.dto.AssignmentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.PostStudentRequestDTO;
-import com.saumrit.myspringbootwithjpa.dto.StudentWithHouseNumberDetailDto;
+import com.saumrit.myspringbootwithjpa.dto.*;
 import com.saumrit.myspringbootwithjpa.model.Student;
 import com.saumrit.myspringbootwithjpa.model.enums.CourseCategory;
 import com.saumrit.myspringbootwithjpa.service.MyStudentService;
@@ -216,6 +213,29 @@ public class MyStudentController {
     public Student enrollStudentToTutorialCourse(@PathVariable("rollId") String rollId, @PathVariable("name") String courseName,
                                                  @RequestParam("category")CourseCategory category){
         return myStudentService.updateSingleStudentWithTutoriaCourseDetail(rollId,courseName,category);
+    }
+    @Operation(summary = "Fetch student name & city order by student name length",
+            description = "Fetch student count & city grouping by city & having student count more than 1")
+    @GetMapping("/studentsByNameLength/{city}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<GetStudentResponseDTO> fetchStudentAndCityByStudentNameLength(@PathVariable("city")String city){
+        return myStudentService.fetchStudentWithCityByStudentNameLength(city);
+    }
+
+    @Operation(summary = "Fetch student count & city grouping by city & having student count more than 1",
+            description = "Fetch student count & city grouping by city & having student count more than 1")
+    @GetMapping("/studentCountMoreThanOneWithCity")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<CityStudentCountDTO> fetchStudentCountBasedOnCity(){
+        return myStudentService.getCityWithStudentCountMoreThanTwo();
     }
 
 

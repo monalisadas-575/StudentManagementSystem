@@ -1,8 +1,10 @@
 package com.saumrit.myspringbootwithjpa.repository;
 
+import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
 import com.saumrit.myspringbootwithjpa.model.Student;
 import com.saumrit.myspringbootwithjpa.repository.custom.MyCustomRepository;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -49,5 +51,23 @@ public interface MyStudentRepository extends JpaRepository<Student, String>, MyC
 
     @Query("SELECT s FROM Student s LEFT JOIN  address a ON  a.city= ?1 AND a.state= ?2")
     public List<Student> getStudentsFromThisStateLeftOuterJoinNoFetch(String city, String state);//Here No FETCH is used, So ON can be used . But it will give N+1 issue
-
+    @Query("""
+        SELECT 
+            s.name as NAME,
+            a.city as CITY
+        FROM Student s
+        JOIN s.address a
+        WHERE a.city = :city
+        ORDER BY LENGTH(s.name) DESC
+        """)
+    public List<Tuple> fetchStudentWithCityOrderByNameLength(String city);
+    @Query("""
+            SELECT COUNT(s) AS STUDENT_COUNT,
+            a.city AS CITY
+        FROM Student s
+        JOIN s.address a
+        GROUP BY a.city
+        HAVING COUNT(s) >1
+        """)
+    public List<Tuple> FetchCityWithStudentCountMoreThanOne();
 }

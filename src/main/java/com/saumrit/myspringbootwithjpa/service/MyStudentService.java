@@ -1,10 +1,7 @@
 package com.saumrit.myspringbootwithjpa.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saumrit.myspringbootwithjpa.dto.AssignmentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
-import com.saumrit.myspringbootwithjpa.dto.PostStudentRequestDTO;
-import com.saumrit.myspringbootwithjpa.dto.StudentWithHouseNumberDetailDto;
+import com.saumrit.myspringbootwithjpa.dto.*;
 import com.saumrit.myspringbootwithjpa.message.producers.StudentProducer;
 import com.saumrit.myspringbootwithjpa.model.*;
 import com.saumrit.myspringbootwithjpa.model.enums.CourseCategory;
@@ -15,6 +12,8 @@ import com.saumrit.myspringbootwithjpa.util.CommonConvertorUtil;
 import com.saumrit.myspringbootwithjpa.util.UniqueIdGeneratorUtil;
 import jakarta.persistence.Tuple;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,8 @@ import java.util.List;
 
 @Service
 public class MyStudentService {
+
+    public static Logger logger= LoggerFactory.getLogger(MyStudentService.class);
 
     public final MyStudentRepository myStudentRepository ;
     public final MySubjectRepository mySubjectRepository;
@@ -45,8 +46,21 @@ public class MyStudentService {
 
 
     public void addSingleStudent(PostStudentRequestDTO POSTStudentRequestDTO){
+        logger.info("Inside the addSingleStudent()");
+        logger.debug("Entered into addSingleStudent() with requestDTO as {}",POSTStudentRequestDTO);
         Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
         student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
+        logger.debug("Value of Student that i got from DB is {} with RollID: {}",student, student.getRollId());
+        myStudentRepository.save(student);
+        studentProducer.produceMessageForAddStudent("addstudent-out-0",student);
+    }
+
+    public void addSingleStudent(PostStudentRequestDTO POSTStudentRequestDTO,String name){
+        logger.info("Inside the addSingleStudent()");
+        logger.debug("Entered into addSingleStudent() with requestDTO as {}",POSTStudentRequestDTO);
+        Student student= createStudentFromStudentDTO(POSTStudentRequestDTO);
+        student.setRollId(uniqueIdGeneratorUtil.generateByApacheText(6));
+        logger.debug("Value of Student that i got from DB is {} with RollID: {}",student, student.getRollId());
         myStudentRepository.save(student);
         studentProducer.produceMessageForAddStudent("addstudent-out-0",student);
     }
@@ -142,8 +156,10 @@ public class MyStudentService {
             return null;
 
         TutorialCourse tutorialCourse= myTutorialCourseService.fetchCourse(courseName);
-        if(null == tutorialCourse.getCourseName())
+        if(null == tutorialCourse.getCourseName()) {
+            logger.warn("Returned size of TutorialCourse is 0");
             return null;
+        }
 
         if(null == student.getTutorialCourses())
             student.setTutorialCourses(List.of(tutorialCourse));
@@ -212,6 +228,9 @@ public class MyStudentService {
     }
 
     public List<GetStudentResponseDTO> getStudentsWithCityDetailFromGivenCountry(String countryName){
+        //Entered into getStudentsWithCityDetailFromGivenCountry()
+        //Entered into getStudentsWithCityDetailFromGivenCountry() where input countryname is countryname
+        //Entering with user
         List<Tuple> results= myStudentRepository.fetchStudentWithTheirCity(countryName);
         List<GetStudentResponseDTO> myResult=results.stream().map( x -> {
             GetStudentResponseDTO getStudentResponseDTO = new GetStudentResponseDTO();
@@ -220,6 +239,10 @@ public class MyStudentService {
             getStudentResponseDTO.setAge(x.get(2,Integer.class));
             return getStudentResponseDTO;
         }).toList();
+        //finishing the getStudentsWithCityDetailFromGivenCountry()
+        //finishing the getStudentsWithCityDetailFromGivenCountry(), returning a list of size myResult.size()
+        //seeing too much students from this country , current list is having size of ,result.size()
+
 
         return myResult;
     }
@@ -228,6 +251,64 @@ public class MyStudentService {
     public Integer updateStudentAgeToThirtyFromThisCity(String city){
         return myStudentRepository.updateAgeByTwoForStudentsFromThisCity(city);
     }
+    @Transactional
+    public Integer deleteStudentByName(String name){
+        return myStudentRepository.deleteStudentByStudentName(name);
+    }
+    @Transactional
+    public List<GetStudentResponseDTO> fetchStudentByNameLength(String city){
+        List<Tuple> tuples = myStudentRepository.fetchStudentWithCityBasedOnNameLengthFromCity(city);
+        List<GetStudentResponseDTO> list = tuples.stream().map(x -> {
+            GetStudentResponseDTO getStudentResponseDTO = new GetStudentResponseDTO();
+            getStudentResponseDTO.setCity(x.get("CITY", String.class));
+            getStudentResponseDTO.setName(x.get("NAME", String.class));
+           // getStudentResponseDTO.setAge(x.get("AGE", Integer.class));
+            return getStudentResponseDTO;
+
+        }).toList();
+
+        return list;
+    }
+
+    @Transactional
+    public List<CityStudentCountDTO> getCityWithStudentCountMoreThanTwo() {
+
+        List<Tuple> cityWithStudentCountMoreThanTwo = myStudentRepository.getCityWithStudentCountMoreThanTwo();
+        List<CityStudentCountDTO> list = cityWithStudentCountMoreThanTwo.stream().map(x -> {
+            CityStudentCountDTO cityStudentCountDTO = new CityStudentCountDTO();
+            cityStudentCountDTO.setCity(x.get("CITY", String.class));
+            cityStudentCountDTO.setStudentCount(x.get("Student_count", Long.class));
+
+            return cityStudentCountDTO;
+
+        }).toList();
+        return list;
+
+    }
+    @Transactional
+    public List<GetStudentResponseDTO> fetchStudentWithCityByStudentNameLength(String city){
+        List<Tuple> tuples = myStudentRepository.fetchStudentWithCityOrderByNameLength(city);
+        List<GetStudentResponseDTO> list = tuples.stream().map(x -> {
+            GetStudentResponseDTO getStudentResponseDTO = new GetStudentResponseDTO();
+            getStudentResponseDTO.setName(x.get("NAME", String.class));
+            getStudentResponseDTO.setCity(x.get("CITY", String.class));
+            return getStudentResponseDTO;
+        }).toList();
+        return list;
+    }
+    @Transactional
+    public List<CityStudentCountDTO> getStudentWithMoreThanOneCount(){
+        List<Tuple> tuples = myStudentRepository.FetchCityWithStudentCountMoreThanOne();
+        List<CityStudentCountDTO> list = tuples.stream().map(x -> {
+            CityStudentCountDTO cityStudentCountDTO = new CityStudentCountDTO();
+            cityStudentCountDTO.setStudentCount(x.get("STUDENT_COUNT", Long.class));
+            cityStudentCountDTO.setCity(x.get("CITY", String.class));
+            return cityStudentCountDTO;
+        }).toList();
+        return list;
+    }
+
+
 
 
 }

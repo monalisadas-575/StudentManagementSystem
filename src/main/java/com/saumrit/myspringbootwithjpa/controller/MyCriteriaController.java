@@ -1,11 +1,13 @@
 package com.saumrit.myspringbootwithjpa.controller;
 
+import com.saumrit.myspringbootwithjpa.dto.CityStudentCountDTO;
 import com.saumrit.myspringbootwithjpa.dto.GetStudentResponseDTO;
 import com.saumrit.myspringbootwithjpa.model.Student;
 import com.saumrit.myspringbootwithjpa.service.MyStudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.Tuple;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,4 +85,43 @@ public class MyCriteriaController {
     public Integer updateAgeToThirty(@PathVariable("city") String city){
         return studentService.updateStudentAgeToThirtyFromThisCity(city);
     }
+
+    @Operation(summary = "Delete student by its name",
+            description = "Delete student by its name")
+    @DeleteMapping("/students/delete/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public Integer deleteStudentByName(@PathVariable("name") String name){
+        return studentService.deleteStudentByName(name);
+    }
+
+    @Operation(summary = "Fetch student name & city order by student name length",
+            description = "Fetch student name & city order by student name length")
+    @GetMapping("/students/NameLength/{city}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<GetStudentResponseDTO> fetchStudentByNameLength(@PathVariable("city") String city){
+        return studentService.fetchStudentByNameLength(city);
+    }
+
+    @Operation(summary = "Fetch student count & city grouping by city & having student count more than 1",
+            description = "Fetch student count & city grouping by city & having student count more than 1")
+    @GetMapping("/students/city/student-count")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Success"),
+            @ApiResponse(responseCode = "400",description = "Bad Request"),
+            @ApiResponse(responseCode = "500",description = "Internal Server Error") })
+    public List<CityStudentCountDTO> fetchStudentCountBasedOnCity(){
+        return studentService.getCityWithStudentCountMoreThanTwo();
+    }
+
+
+
 }

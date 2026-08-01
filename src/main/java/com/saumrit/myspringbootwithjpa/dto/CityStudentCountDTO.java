@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetStudentResponseDTO {
+public class CityStudentCountDTO {
+    private String city;
+    private Long studentCount;
 
-    public String name;
-    //public String standard;
-    public Integer age;
-    public String city;
 }

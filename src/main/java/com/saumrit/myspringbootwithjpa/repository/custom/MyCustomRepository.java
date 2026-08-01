@@ -19,5 +19,14 @@ public interface MyCustomRepository {
 
     Integer updateAgeByTwoForStudentsFromThisCity(String city);
 
+    Integer deleteStudentByStudentName(String name);
+
+    List<Tuple> fetchStudentWithCityBasedOnNameLengthFromCity(String city);
+
+    List<Tuple> getCityWithStudentCountMoreThanTwo( );
+
+
+
+
 //    Integer deleteStudent
 }

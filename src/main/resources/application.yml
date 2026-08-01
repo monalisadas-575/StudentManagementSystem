@@ -42,3 +42,25 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    com.saumrit.*: INFO
+    com:
+      saumrit:
+        myspringbootwithjpa:
+          service: DEBUG
+          controller: INFO
+          repository: DEBUG
+  structured:
+    format:
+      console: logstash
+      file: logstash
+
+  file:
+    name: "C:\\Users\\monal\\IdeaProjects\\MyLoggingFolder\\myspringbootwithjpa.log"
+  logback:
+    max-file-size: 10MB
+
+
