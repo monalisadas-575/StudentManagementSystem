@@ -63,4 +63,13 @@ logging:
   logback:
     max-file-size: 10MB
 
+library:
+  book:
+    issue:
+      uri: "http://localhost:8086/issue/{name}/{category}"
+    return:
+      uri: "wdwdwd"
+
+server.port: 8085
+
 
