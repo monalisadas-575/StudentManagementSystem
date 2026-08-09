@@ -48,7 +48,7 @@ public class MyStudentService {
         this.objectMapper = objectMapper;
     }
 
-
+    @Transactional
     public void addSingleStudent(PostStudentRequestDTO POSTStudentRequestDTO) {
         logger.info("Inside the addSingleStudent()");
         logger.debug("Entered into addSingleStudent() with requestDTO as {}", POSTStudentRequestDTO);
@@ -59,6 +59,7 @@ public class MyStudentService {
         studentProducer.produceMessageForAddStudent("addstudent-out-0", student);
     }
 
+    @Transactional
     public void addSingleStudent(PostStudentRequestDTO POSTStudentRequestDTO, String name) {
         logger.info("Inside the addSingleStudent()");
         logger.debug("Entered into addSingleStudent() with requestDTO as {}", POSTStudentRequestDTO);
@@ -68,7 +69,7 @@ public class MyStudentService {
         myStudentRepository.save(student);
         studentProducer.produceMessageForAddStudent("addstudent-out-0", student);
     }
-
+    @Transactional
     public void addMultipleStudent(List<PostStudentRequestDTO> studentrequestDTOs) {
         logger.info("Inside the addMultipleStudent()");
         logger.debug("Entered into addMultipleStudent() with requestDTO as {}", studentrequestDTOs);
@@ -143,7 +144,7 @@ public class MyStudentService {
                 .map(x -> objectMapper.convertValue(x, GetStudentResponseDTO.class))
                 .toList();
     }
-
+    @Transactional
     public Student updateSingleStudent(Student student) {
         logger.info("Inside the updateSingleStudent");
         logger.debug("Student received for update {}", student);
@@ -152,7 +153,7 @@ public class MyStudentService {
         return updatedStudent;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {StudentNotFoundException.class})
     public AssignmentResponseDTO updateSingleStudentWithAssignmentDetail(String rollId, String subjectName) {
         logger.info("Inside the updateSingleStudentWithAssignmentDetail()");
         logger.debug("Updating Student AssignmentDetails matching with rollId:{} with a new subject: {}", rollId, subjectName);
@@ -177,7 +178,7 @@ public class MyStudentService {
         return CommonConvertorUtil.assignmentToAssignmentResponseDTO(assignment);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {StudentNotFoundException.class})
     public Student updateSingleStudentWithAwardDetail(String rollId, List<String> awards) {
         Student student = myStudentRepository.findByNameOrRollId(null, rollId);
 
@@ -191,7 +192,7 @@ public class MyStudentService {
         return response;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {CourseNotFoundException.class,StudentNotFoundException.class})
     public Student updateSingleStudentWithTutoriaCourseDetail(String rollId, String courseName, CourseCategory category) {
 
         Student student = myStudentRepository.findByNameOrRollId(null, rollId);

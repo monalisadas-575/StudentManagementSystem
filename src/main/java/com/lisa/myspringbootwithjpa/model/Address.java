@@ -11,8 +11,8 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "theStudent")//this is add on  to avoid stackOverflow due to circular dependency issue
-@Entity(name = "address")//just fpr bak-chodi , i used this annotation
+@ToString(exclude = "theStudent")//this is added on  to avoid stackOverflow due to circular dependency issue
+@Entity(name = "address")//just for trial, i used this annotation, no need of this
 public class Address {
 
     @Id
