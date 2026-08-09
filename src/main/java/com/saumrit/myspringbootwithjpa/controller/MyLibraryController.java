@@ -16,7 +16,7 @@ public class MyLibraryController {
 
     public final Logger logger= LoggerFactory.getLogger(MyLibraryController.class);
 
-    public final MyLibraryService myLibraryService;
+    public MyLibraryService myLibraryService;
 
     public MyLibraryController(MyLibraryService myLibraryService) {
         this.myLibraryService = myLibraryService;
@@ -31,8 +31,8 @@ public class MyLibraryController {
             @ApiResponse(responseCode = "400",description = "Not Found"),
             @ApiResponse(responseCode = "500",description = "Internal Server Error") })
     public void issueBooks(@RequestParam(name="bookCount") Integer bookCount,
-                           @PathVariable(name = "bookCategory") String bookCategory,
-                           @PathVariable(name= "bookName") String bookName,
+                           @PathVariable(name = "category") String bookCategory,
+                           @PathVariable(name= "name") String bookName,
                            @RequestBody BookIssueRequestDTO bookIssueRequestDTO){
         myLibraryService.issueBook(bookName,bookCategory,bookCount,bookIssueRequestDTO);
 

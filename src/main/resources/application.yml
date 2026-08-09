@@ -45,7 +45,6 @@ springdoc:
 
 logging:
   level:
-    root: INFO
     com.saumrit.*: INFO
     com:
       saumrit:
@@ -53,10 +52,10 @@ logging:
           service: DEBUG
           controller: INFO
           repository: DEBUG
-  structured:
-    format:
-      console: logstash
-      file: logstash
+#  structured:
+#    format:
+#      console: logstash
+#      file: logstash
 
   file:
     name: "C:\\Users\\monal\\IdeaProjects\\MyLoggingFolder\\myspringbootwithjpa.log"

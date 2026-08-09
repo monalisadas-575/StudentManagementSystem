@@ -10,23 +10,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRunTimeException(RuntimeException e){
-        return ResponseEntity.internalServerError().body(e.getMessage());
-    }
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<String> handleNullPointerException(NullPointerException e){
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<String> handleStudentNotFoundException(StudentNotFoundException e){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<String> handleCourseNotFoundException(CourseNotFoundException e){
         //here no bad request , instead not Found error
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return ResponseEntity.notFound().build();
     }
 }

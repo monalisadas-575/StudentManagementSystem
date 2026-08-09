@@ -10,13 +10,12 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class TheLabExperimentId implements Serializable {
 
 
-    private Student student;
-    private Subject subject;
-    private Lecture guide;
+    private Long student;
+    private Long subject;
+    private Long guide;
 
 
 

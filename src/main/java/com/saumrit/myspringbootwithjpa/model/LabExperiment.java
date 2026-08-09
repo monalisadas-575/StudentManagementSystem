@@ -25,12 +25,13 @@ public class LabExperiment {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "subject_id",referencedColumnName = "id")
+    @JoinColumn(name = "subject_id")
     private Subject subject;
+
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "lecture_id",referencedColumnName = "id")
+    @JoinColumn(name = "lecture_id")
     private Lecture guide;
 
     private LocalDateTime experimentDateTime;
